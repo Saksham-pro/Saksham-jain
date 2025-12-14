@@ -1,0 +1,5 @@
+{
+  "name": "Hum Chale Vihar",
+  "description": "A Jainism-themed community app for tracking Vihars (pilgrimages) and conducting community polls. Features separate Admin/User panels, mobile-friendly design, and AI-enhanced content.",
+  "requestFramePermissions": []
+}
