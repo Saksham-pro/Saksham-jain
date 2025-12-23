@@ -27,12 +27,17 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = ({ user, vihars, polls,
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-jain-500 to-jain-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-br from-viharGreen to-viharGreen/80 rounded-3xl p-6 text-white shadow-xl shadow-viharGreen/10 relative overflow-hidden">
         <div className="relative z-10">
-           <h2 className="text-3xl font-bold mb-2">Jai Jinendra, {user.name}!</h2>
-           <p className="text-jain-100 mb-6 italic opacity-90 text-lg">"{quote}"</p>
+           <h2 className="text-3xl font-black mb-1 tracking-tight">Jai Jinendra, {user.name}!</h2>
+           <p className="text-jain-200 mb-6 italic opacity-90 text-lg leading-snug">"{quote}"</p>
+           <div className="flex gap-2">
+              <span className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-wider">Ahimsa</span>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-wider">Satya</span>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-wider">Anekantavada</span>
+           </div>
         </div>
-        <Sparkles className="absolute top-4 right-4 text-jain-300 w-24 h-24 opacity-20 animate-spin-slow" />
+        <Sparkles className="absolute top-4 right-4 text-white w-24 h-24 opacity-10 animate-spin-slow" />
       </div>
 
       {/* Dashboard Grid */}
@@ -40,14 +45,14 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = ({ user, vihars, polls,
         {/* Ongoing Vihars Widget */}
         <div 
           onClick={() => onChangeView('VIHAR')}
-          className="bg-white rounded-2xl p-5 border border-jain-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+          className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
         >
-          <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-             <h3 className="text-lg font-bold text-jain-800 flex items-center">
-               <MapPin className="w-5 h-5 mr-2 text-jain-500" />
+          <div className="flex justify-between items-center mb-4 border-b border-gray-50 pb-3">
+             <h3 className="text-lg font-black text-gray-800 flex items-center tracking-tight">
+               <MapPin className="w-5 h-5 mr-2 text-viharOrange" />
                Ongoing Vihars
              </h3>
-             <span className="bg-jain-100 text-jain-700 px-2 py-1 rounded-md text-xs font-bold">
+             <span className="bg-viharOrange/10 text-viharOrange px-2.5 py-1 rounded-lg text-xs font-bold">
                {ongoingVihars.length} Active
              </span>
           </div>
@@ -55,19 +60,19 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = ({ user, vihars, polls,
           {ongoingVihars.length > 0 ? (
             <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
               {ongoingVihars.map(vihar => (
-                <div key={vihar.id} className="border-l-4 border-jain-400 pl-3 py-1 hover:bg-gray-50 transition-colors">
-                  <p className="font-semibold text-gray-800">{vihar.title}</p>
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
+                <div key={vihar.id} className="border-l-4 border-viharGreen pl-3 py-1.5 hover:bg-gray-50 transition-colors">
+                  <p className="font-bold text-gray-800">{vihar.title}</p>
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
                     <span className="truncate">{vihar.from}</span>
-                    <span>➝</span>
+                    <span className="text-viharOrange">➝</span>
                     <span className="truncate">{vihar.to}</span>
                   </p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-6 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-               No ongoing vihars
+            <div className="text-center py-8 text-gray-400 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+               No ongoing vihars at the moment
             </div>
           )}
         </div>
@@ -75,14 +80,14 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = ({ user, vihars, polls,
         {/* Active Polls Widget */}
         <div 
            onClick={() => onChangeView('POLL')}
-           className="bg-white rounded-2xl p-5 border border-jain-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+           className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
         >
-          <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-             <h3 className="text-lg font-bold text-jain-800 flex items-center">
-               <Activity className="w-5 h-5 mr-2 text-jain-500" />
+          <div className="flex justify-between items-center mb-4 border-b border-gray-50 pb-3">
+             <h3 className="text-lg font-black text-gray-800 flex items-center tracking-tight">
+               <Activity className="w-5 h-5 mr-2 text-viharGreen" />
                Community Polls
              </h3>
-             <span className="bg-jain-100 text-jain-700 px-2 py-1 rounded-md text-xs font-bold">
+             <span className="bg-viharGreen/10 text-viharGreen px-2.5 py-1 rounded-lg text-xs font-bold">
                {activePolls.length} Active
              </span>
           </div>
@@ -90,19 +95,19 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = ({ user, vihars, polls,
           {activePolls.length > 0 ? (
              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                {activePolls.map(poll => (
-                 <div key={poll.id} className="bg-jain-50 p-3 rounded-xl hover:bg-jain-100 transition-colors">
-                   <p className="font-medium text-jain-900 mb-2">{poll.question}</p>
-                   <div className="flex gap-2 text-xs text-gray-500">
+                 <div key={poll.id} className="bg-gray-50/50 p-4 rounded-2xl hover:bg-jain-100 transition-colors border border-gray-100">
+                   <p className="font-bold text-gray-800 mb-2 leading-tight">{poll.question}</p>
+                   <div className="flex gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                       <span>{poll.options.length} options</span>
-                      <span>•</span>
+                      <span className="text-viharOrange">•</span>
                       <span>{poll.options.reduce((acc, curr) => acc + curr.votes, 0)} votes</span>
                    </div>
                  </div>
                ))}
              </div>
           ) : (
-             <div className="text-center py-6 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                No active polls
+             <div className="text-center py-8 text-gray-400 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                Check back later for polls
              </div>
           )}
         </div>

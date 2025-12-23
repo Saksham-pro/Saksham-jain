@@ -1,10 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Initialize the Gemini client
-// Note: In a real production app, ensure the key is restricted or proxied.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
-const MODEL_NAME = "gemini-2.5-flash";
+const MODEL_NAME = "gemini-3-flash-preview";
 
 export const generateJainQuote = async (): Promise<string> => {
   try {

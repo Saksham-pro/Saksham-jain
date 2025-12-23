@@ -4,10 +4,13 @@ import { HomeFeatures } from './components/HomeFeatures';
 import { ViharFeatures } from './components/ViharFeatures';
 import { PollFeatures } from './components/PollFeatures';
 import { Auth } from './components/Auth';
+import { SplashScreen } from './components/SplashScreen';
 import { User, Vihar, Poll, View, AppNotification } from './types';
 import * as Storage from './services/storageService';
 
 const App: React.FC = () => {
+  const [isAppLoading, setIsAppLoading] = useState(true);
+
   // Initialize user from storage immediately to persist session
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('hcv_user');
@@ -20,19 +23,23 @@ const App: React.FC = () => {
   });
 
   const [currentView, setCurrentView] = useState<View>(() => {
-    // If user is already logged in, start at HOME
     const saved = localStorage.getItem('hcv_user');
     return saved ? View.HOME : View.LOGIN;
   });
   
-  // App Data State - Initialize lazily from storage to prevent race conditions
   const [vihars, setVihars] = useState<Vihar[]>(() => Storage.getVihars());
   const [polls, setPolls] = useState<Poll[]>(() => Storage.getPolls());
   const [notifications, setNotifications] = useState<AppNotification[]>(() => Storage.getNotifications());
-  
   const [toast, setToast] = useState<AppNotification | null>(null);
 
-  // Helper to dispatch notifications
+  useEffect(() => {
+    // Show splash screen for 6 seconds as requested
+    const timer = setTimeout(() => {
+      setIsAppLoading(false);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const dispatchNotification = (title: string, message: string, type: AppNotification['type']) => {
     const newNotif: AppNotification = {
       id: Date.now().toString(),
@@ -49,25 +56,10 @@ const App: React.FC = () => {
       return updated;
     });
 
-    // Show In-App Toast
     setToast(newNotif);
 
-    // Vibration for mobile feel (Haptic Feedback)
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate(200);
-    }
-
-    // Trigger Browser System Notification (Real-time effect)
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification(title, {
-          body: message,
-          icon: '/favicon.ico', // Fallback if no icon
-          tag: 'hcv-notification'
-        });
-      } catch (e) {
-        console.log("Notification API error", e);
-      }
     }
   };
 
@@ -81,16 +73,10 @@ const App: React.FC = () => {
     });
   };
 
-  // Auth Handlers
   const handleLogin = (u: User) => {
     setUser(u);
     localStorage.setItem('hcv_user', JSON.stringify(u));
     setCurrentView(View.HOME);
-    
-    // Request permission on login if convenient
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
   };
 
   const handleLogout = () => {
@@ -99,64 +85,77 @@ const App: React.FC = () => {
     setCurrentView(View.LOGIN);
   };
 
-  // Vihar Handlers
   const handleAddVihar = (v: Vihar) => {
-    const updated = [v, ...vihars];
-    setVihars(updated);
-    Storage.saveVihars(updated); // Persist immediately
+    setVihars(prev => {
+      const updated = [v, ...prev];
+      Storage.saveVihars(updated);
+      return updated;
+    });
     dispatchNotification('New Vihar Planned', `Join the journey from ${v.from} to ${v.to}!`, 'vihar');
   };
 
   const handleUpdateVihar = (v: Vihar) => {
-    const updated = vihars.map(item => item.id === v.id ? v : item);
-    setVihars(updated);
-    Storage.saveVihars(updated); // Persist immediately
-    
-    if (v.status === 'completed') {
-      dispatchNotification('Vihar Completed', `The vihar to ${v.to} has successfully completed. Anumodana!`, 'vihar');
-    } else {
-      dispatchNotification('Vihar Updated', `${v.title} details have been updated.`, 'info');
-    }
+    setVihars(prev => {
+      const updated = prev.map(item => item.id === v.id ? v : item);
+      Storage.saveVihars(updated);
+      return updated;
+    });
   };
 
   const handleDeleteVihar = (id: string) => {
-    const updated = vihars.filter(item => item.id !== id);
-    setVihars(updated);
-    Storage.saveVihars(updated); // Persist immediately
-    dispatchNotification('Vihar Removed', 'A vihar entry was removed.', 'info');
+    Storage.markAsPermanentlyDeleted(id);
+    setVihars(prev => {
+      const updated = prev.filter(item => item.id !== id);
+      Storage.saveVihars(updated);
+      return updated;
+    });
+    dispatchNotification('Vihar Removed', 'A vihar entry was permanently removed.', 'info');
   };
 
-  // Poll Handlers
   const handleAddPoll = (p: Poll) => {
-    const updated = [p, ...polls];
-    setPolls(updated);
-    Storage.savePolls(updated); // Persist immediately
+    setPolls(prev => {
+      const updated = [p, ...prev];
+      Storage.savePolls(updated);
+      return updated;
+    });
     dispatchNotification('New Poll', p.question, 'poll');
   };
 
   const handleUpdatePoll = (p: Poll) => {
-    const updated = polls.map(item => item.id === p.id ? p : item);
-    setPolls(updated);
-    Storage.savePolls(updated); // Persist immediately
+    setPolls(prev => {
+      const updated = prev.map(item => item.id === p.id ? p : item);
+      Storage.savePolls(updated);
+      return updated;
+    });
   };
 
   const handleDeletePoll = (id: string) => {
-    const updated = polls.filter(item => item.id !== id);
-    setPolls(updated);
-    Storage.savePolls(updated); // Persist immediately
+    Storage.markAsPermanentlyDeleted(id);
+    setPolls(prev => {
+      const updated = prev.filter(item => item.id !== id);
+      Storage.savePolls(updated);
+      return updated;
+    });
+    dispatchNotification('Poll Removed', 'A community poll was permanently deleted.', 'info');
   };
   
   const handleVote = (pollId: string, optionId: string) => {
-    const updated = polls.map(p => {
-      if (p.id !== pollId) return p;
-      return {
-        ...p,
-        options: p.options.map(opt => opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt)
-      };
+    setPolls(prev => {
+      const updated = prev.map(p => {
+        if (p.id !== pollId) return p;
+        return {
+          ...p,
+          options: p.options.map(opt => opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt)
+        };
+      });
+      Storage.savePolls(updated);
+      return updated;
     });
-    setPolls(updated);
-    Storage.savePolls(updated); // Persist immediately
   };
+
+  if (isAppLoading) {
+    return <SplashScreen />;
+  }
 
   if (!user || currentView === View.LOGIN) {
     return <Auth onLogin={handleLogin} />;

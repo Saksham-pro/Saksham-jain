@@ -14,6 +14,7 @@ export interface Vihar {
   to: string;
   startDate: string;
   status: 'planned' | 'ongoing' | 'completed';
+  participants?: string[]; // Array of User IDs who are joining
 }
 
 export interface PollOption {
